@@ -1,0 +1,100 @@
+package dev.seleniumhq
+
+import org.openqa.selenium.By
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.support.ui.Select
+import java.time.Duration
+
+
+
+fun main(args: Array<String>) {
+    paymentDetails("afflabs194","EJIcRcuIp8o#P@")
+}
+fun paymentDetails(login: String, password : String) {
+    val driver = ChromeDriver()
+    driver.manage().timeouts().implicitlyWait(Duration.ofMillis(4000))
+    driver.get("https://comeonconnect.omarsys.com/g/login")
+    Thread.sleep(4000)
+    println("woke up")
+    //val title = driver.title
+//    assertEquals("Web form", title)
+
+    //driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500))
+
+    val loginField = driver.findElement(By.id("i1"))
+    val passwordField = driver.findElement(By.id("i2"))
+    val buttons  = driver.findElements(By.cssSelector("button"))
+
+    var confirmButton = driver.findElement(By.cssSelector("button"))
+
+    for (button in buttons) {
+        println("Button: " + button.text)
+        if (button.text=="Login") {
+            confirmButton = button
+        }
+    }
+
+    loginField.sendKeys(login)
+    passwordField.sendKeys(password)
+    //println(confirmButton.text)
+    takeScreen(1, driver)
+    confirmButton.click()
+    Thread.sleep(3500)
+
+
+    driver.get("https://comeonconnect.omarsys.com/a/account/payment-info")
+    Thread.sleep(3500)
+
+    val paymentType = driver.findElement(By.id("i1"))
+    val select = Select(paymentType)
+    if(!paymentType.isEnabled)
+    {
+        println("Details are already changed")
+        driver.quit()
+    }
+    select.selectByVisibleText("Bank Wire Transfer")
+
+
+/*  TOP ADS HK LIMITED  https://prnt.sc/RJavuTxfnaz7
+    Beneficiary’s Address:	FLAT 79, 1/F, BLOCK 2, CAMELPAINT BUILDING, 62 HOI YUEN ROAD, KWUN TONG, KOWLOON, HK
+    Beneficiary’s Bank:	Citibank
+    Bank’s Address:
+    1 North Wall Quay, International Financial Services Centre (IFSC), Dublin 1, Ireland
+    IBAN(EUR)	IE95CITI99005171130019
+     SWIFT:	CITIIE2X*/
+
+    val payeeName = driver.findElement(By.id("i101"))   //Payee name
+    payeeName.sendKeys("TOP ADS HK LIMITED")
+    val payoutValue = driver.findElement(By.id("i302")) //Minimum payout value
+    payoutValue.sendKeys("50")
+    val bankName = driver.findElement(By.id("i111"))    //Bank name
+    bankName.sendKeys("Citibank")
+    val bankCity = driver.findElement(By.id("i113"))    //Bank city
+    bankCity.sendKeys("Dublin")
+    val bankAddress = driver.findElement(By.id("i114")) //Bank address
+    bankAddress.sendKeys("1 North Wall Quay, International Financial Services Centre (IFSC), Dublin 1, Ireland")
+    val ibanCode = driver.findElement(By.id("i116"))    //IBAN code
+    ibanCode.sendKeys("IE95CITI99005171130019")
+    val swiftCode = driver.findElement(By.id("i117"))   //BIC/ABA/Swift code
+    swiftCode.sendKeys("CITIIE2X")
+
+    val bankCountry = Select(driver.findElement(By.id("i112"))) //Bank country
+    bankCountry.selectByVisibleText("Ireland")
+    val euOption = Select(driver.findElement(By.id("i118"))) //EU/Non EU
+    euOption.selectByVisibleText("SEPA")
+    val vatStatus = Select(driver.findElement(By.id("i103"))) //VAT/GST Status
+    vatStatus.selectByVisibleText("Not registered")
+    val invoiceYN = Select(driver.findElement(By.id("i105")))
+    invoiceYN.selectByVisibleText("I will issue and send the Invoice myself")//Invoice
+
+
+    val buttons2  = driver.findElements(By.cssSelector("button"))
+    for (button in buttons2) {
+        println("Button: " + button.text)
+        if (button.text=="Save") {
+            button.click()
+        }
+    }
+
+     driver.quit()
+}
